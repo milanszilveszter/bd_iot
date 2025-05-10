@@ -1,0 +1,61 @@
+services:
+  influxdb:
+    image: influxdb:latest
+    container_name: influxdb
+    ports:
+      - "8086:8086"
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=Admin1234
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=YLtQhSYmq-K7LFHV2UuMAAnFoySzfEuUFj-5D3r9irDPqdJ3I1JwVMAju2oo9RSHm30b4LjVSb861nPhdmE3lQ==
+      - DOCKER_INFLUXDB_INIT_ORG=oe
+      - DOCKER_INFLUXDB_INIT_BUCKET=iot_sensors
+    volumes:
+      - influxdb_data:/var/lib/influxdb
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8086/health"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+    networks:
+      - iot_network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - influxdb
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - iot_network
+
+  python-sensor:
+    build: .
+    container_name: sensor-data-generator
+    depends_on:
+      influxdb:
+        condition: service_healthy
+    environment:
+      INFLUXDB_URL: http://influxdb:8086
+      INFLUXDB_TOKEN: YLtQhSYmq-K7LFHV2UuMAAnFoySzfEuUFj-5D3r9irDPqdJ3I1JwVMAju2oo9RSHm30b4LjVSb861nPhdmE3lQ==
+      INFLUXDB_ORG: oe
+      INFLUXDB_BUCKET: iot_sensors
+    volumes:
+      - ./sensor_data_generator.py:/app/sensor_data_generator.py
+    command: ["python3", "-u", "/app/sensor_data_generator.py"]
+    networks:
+      - iot_network
+
+volumes:
+  influxdb_data:
+  grafana_data:
+
+networks:
+  iot_network:
