@@ -14,3 +14,7 @@ Tools: Python, InfluxDB, Grafana, Docker
 ### InfluxDB login:
 Username: <code>admin</code><br>
 Password: <code>Admin1234</code>
+
+### Grafana login:
+Username: <code>admin</code><br>
+Password: <code>admin</code>
