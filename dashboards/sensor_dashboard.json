@@ -1,0 +1,55 @@
+{
+  "id": null,
+  "uid": "iot-dashboard",
+  "title": "IoT Hőmérséklet és Páratartalom",
+  "timezone": "browser",
+  "schemaVersion": 36,
+  "version": 1,
+  "refresh": "10s",
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Hőmérséklet és Páratartalom",
+      "id": 1,
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"iot_sensors\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"environment\" and r._field == \"temperature\")",
+          "queryType": "flux"
+        },
+        {
+          "refId": "B",
+          "query": "from(bucket: \"iot_sensors\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"environment\" and r._field == \"humidity\")",
+          "queryType": "flux"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "none",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 30 },
+              { "color": "red", "value": 50 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      }
+    }
+  ]
+}
