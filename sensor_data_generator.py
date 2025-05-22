@@ -39,9 +39,9 @@ def simulate_environmental_data(location, timestamp):
     co2 = round(400 + random.uniform(0, 50) + (100 if 8 <= hour_of_day <= 22 else 0), 1)
     
     # Light level (lux) - follows day/night pattern with randomness
-    light_level = round(max(0, 500 * (day_cycle + 1) + random.uniform(-50, 50)), 1)
+    light_level = float(round(max(0, 500 * (day_cycle + 1) + random.uniform(-50, 50)), 1))
     if 22 <= hour_of_day or hour_of_day <= 6:  # night time
-        light_level = round(random.uniform(0, 10), 1)  # minimal light at night
+        light_level = float(round(random.uniform(0, 10), 1))  # minimal light at night
     
     return temperature, humidity, co2, light_level
 
